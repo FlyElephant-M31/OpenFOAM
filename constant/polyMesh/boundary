@@ -7,30 +7,68 @@
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
-    version     2.0;
+    version     0.0;
     format      ascii;
-    class       dictionary;
-    location    "system";
-    object      decomposeParDict;
+    class       polyBoundaryMesh;
+    location    "constant/polyMesh";
+    object      boundary;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-numberOfSubdomains 4;
 
-method          simple;
-
-simpleCoeffs
+7
+(
+outlet
 {
-    n               ( 2 2 1 );
-    delta           0.001;
+    type            patch;
+    nFaces          30;
+    startFace       6368;
 }
 
-hierarchicalCoeffs
+top
 {
-    n               ( 2 2 1 );
-    delta           0.001;
-    order           xyz;
+    type            slip;
+    nFaces          100;
+    startFace       6398;
 }
+
+bottom
+{
+    type            wall;
+    nFaces          100;
+    startFace       6498;
+}
+
+inlet
+{
+    type            patch;
+    nFaces          30;
+    startFace       6598;
+}
+
+front
+{
+    type            empty;
+    nFaces          3251;
+    startFace       6628;
+}
+
+back
+{
+    type            empty;
+    nFaces          3251;
+    startFace       9879;
+}
+
+cylinder
+{
+    type            wall;
+    inGroups        1 ( wall );
+    nFaces          32;
+    startFace       13130;
+}
+
+)
 
 
 // ************************************************************************* //

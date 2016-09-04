@@ -20,30 +20,40 @@ internalField   uniform 0;
 
 boundaryField
 {
-    inlet
+    inlet 
     {
         type            zeroGradient;
     }
-    side
-    {
-        type            zeroGradient;
-    }
-    outlet
+
+    outlet 
     {
         type            fixedValue;
-        value           $internalField;
+        value           uniform 0;
     }
-    cylinder
+
+    bottom
     {
         type            zeroGradient;
     }
-    front
-    {   
+
+    cylinder 
+    {
         type            zeroGradient;
     }
-    back 
-    {   
-        type            zeroGradient;
+
+    top    
+    {
+        type            slip;
+    }
+
+    front
+    {
+        type            empty;
+    }
+
+    back
+    {
+        type            empty;
     }
 }
 

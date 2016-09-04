@@ -19,7 +19,7 @@ RASModel        laminar;
 
 turbulence      on;
 
-printCoeffs     off;
+printCoeffs     on;
 
 
 // ************************************************************************* //

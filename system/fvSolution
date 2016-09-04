@@ -10,113 +10,50 @@ FoamFile
     version     2.0;
     format      ascii;
     class       dictionary;
+    location    "system";
     object      fvSolution;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 solvers
 {
-    pcorr
-    {
-        solver           GAMG;
-        tolerance        0.02;
-        relTol           0;
-        smoother         GaussSeidel;
-        nPreSweeps       0;
-        nPostSweeps      2;
-        cacheAgglomeration true;
-        agglomerator     faceAreaPair;
-        nCellsInCoarsestLevel 10;
-        mergeLevels      1;
-    }
-
     p
     {
-        $pcorr
-        tolerance        1e-7;
-        relTol           0.01;
+        solver          GAMG;
+        tolerance       1e-06;
+        relTol          0.1;
+        smoother        GaussSeidel;
+        nPreSweeps      0;
+        nPostSweeps     2;
+        cacheAgglomeration on;
+        agglomerator    faceAreaPair;
+        nCellsInCoarsestLevel 10;
+        mergeLevels     1;
     }
 
     pFinal
     {
         $p;
-        tolerance        1e-7;
-        relTol           0;
+        tolerance       1e-06;
+        relTol          0;
     }
 
-    "(U|k|omega|S)"
+    "(U|k|epsilon|R|nuTilda)"
     {
         solver          smoothSolver;
-        smoother        symGaussSeidel;
-        tolerance       1e-06;
-        relTol          0.1;
-    }
-
-    "(U|k|omega|S)Final"
-    {
-        $U;
-        tolerance       1e-06;
-        relTol          0;
-    }
-
-    cellDisplacement
-    {
-        solver          GAMG;
-        tolerance       1e-5;
-        relTol          0;
         smoother        GaussSeidel;
-        cacheAgglomeration true;
-        nCellsInCoarsestLevel 10;
-        agglomerator    faceAreaPair;
-        mergeLevels     1;
+        tolerance       1e-05;
+        relTol          0;
     }
 }
 
-PIMPLE
+PISO
 {
-    correctPhi          yes;
-    nOuterCorrectors    3;
-    nCorrectors         2;
+    nCorrectors     2;
     nNonOrthogonalCorrectors 0;
-    residualControl
-    {
-        S
-        {
-            relTol      0;
-            tolerance   1e-6;
-        }
-
-        U
-        {
-            relTol      0;
-            tolerance   1e-5;
-        }
-
-        p
-        {
-            relTol      0;
-            tolerance   1e-3;
-        }
-
-    }
+    pRefCell        0;
+    pRefValue       0;
 }
 
-relaxationFactors
-{
-    fields
-    {
-        p               0.3;
-    }
-    equations
-    {
-        "(U|k|S|omega)"   0.7;
-        "(U|k|S|omega)Final" 1.0;
-    }
-}
-
-cache
-{
-    grad(U);
-}
 
 // ************************************************************************* //
