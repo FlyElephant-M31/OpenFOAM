@@ -9,38 +9,46 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       volScalarField;
-    location    "0";
-    object      k;
+    class       dictionary;
+    location    "system";
+    object      controlDict;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [0 2 -2 0 0 0 0];
+application     scalarPimpleDyMFoam;
 
-internalField   uniform 0.00325;
+startFrom       latestTime;
 
-boundaryField
-{
-    frontAndBack
-    {
-        type            empty;
-    }
-    domain_boundary
-    {
-        type            freestream;
-        freestreamValue uniform 0.00325;
-    }
-    wing
-    {
-        type            kqRWallFunction;
-        value           uniform 0;
-    }
-    ground
-    {
-        type            kqRWallFunction;
-        value           uniform 0;
-    }
-}
+startTime       0;
 
+stopAt          endTime;
+
+endTime         1;
+
+deltaT          1e-6;
+
+writeControl    adjustableRunTime;
+
+writeInterval   0.005;
+
+purgeWrite      0;
+
+writeFormat     ascii;
+
+writePrecision  10;
+
+writeCompression off;
+
+timeFormat      general;
+
+timePrecision   6;
+
+runTimeModifiable true;
+
+adjustTimeStep  yes;
+
+maxCo           0.8;
+
+libs ( "libgroovyBC.so" "libOpenFOAM.so" );
 
 // ************************************************************************* //

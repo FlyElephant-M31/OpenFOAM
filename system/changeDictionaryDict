@@ -9,38 +9,24 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       volScalarField;
-    location    "0";
-    object      epsilon;
+    class       dictionary;
+    object      changeDictionaryDict;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [0 2 -3 0 0 0 0];
-
-internalField   uniform 0.000765;
-
-boundaryField
+dictionaryReplacement
 {
-    frontAndBack
+    boundary
     {
-        type            empty;
-    }
-    domain_boundary
-    {
-        type            freestream;
-        freestreamValue uniform 0.000765;
-    }
-    wing
-    {
-        type            epsilonWallFunction;
-        value           uniform 0;
-    }
-    ground
-    {
-        type            epsilonWallFunction;
-        value           uniform 0;
+        front 
+        {
+            type            empty;
+        }
+        back 
+        {
+            type            empty;
+        }
     }
 }
-
 
 // ************************************************************************* //

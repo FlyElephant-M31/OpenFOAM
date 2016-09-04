@@ -10,37 +10,41 @@ FoamFile
     version     2.0;
     format      ascii;
     class       volScalarField;
-    location    "0";
-    object      nut;
+    object      p;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [0 2 -1 0 0 0 0];
+dimensions      [0 2 -2 0 0 0 0];
 
 internalField   uniform 0;
 
 boundaryField
 {
-    frontAndBack
+    inlet
     {
-        type            empty;
+        type            zeroGradient;
     }
-    domain_boundary
+    side
     {
-        type            freestream;
-        freestreamValue uniform 0.14;
+        type            zeroGradient;
     }
-    wing
+    outlet
     {
-        type            nutkWallFunction;
-        value           uniform 0;
+        type            fixedValue;
+        value           $internalField;
     }
-    ground
+    cylinder
     {
-        type            nutkWallFunction;
-        value           uniform 0;
+        type            zeroGradient;
+    }
+    front
+    {   
+        type            zeroGradient;
+    }
+    back 
+    {   
+        type            zeroGradient;
     }
 }
-
 
 // ************************************************************************* //

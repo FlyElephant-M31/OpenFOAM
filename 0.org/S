@@ -9,51 +9,49 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       dictionary;
-    object      fvSchemes;
+    class       volScalarField;
+    object      S;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-ddtSchemes
-{
-    default Euler;
-}
+dimensions      [0 0 0 0 0 0 0];
 
-gradSchemes
-{
-    default         Gauss linear;
-}
+internalField   uniform 0;
 
-divSchemes
+boundaryField
 {
-    default         Gauss upwind;//Gauss linearUpwind leastSquares;
-    // div(phi,U)	Gauss linearUpwind grad(U);
-    // div(phi,nuTilda)     limitedLinear 1;
-    // div(phi,k)      limitedLinear 1;
-    // div(phi,omega)  limitedLinear 1;
-    div((nuEff*dev(T(grad(U))))) Gauss linear;
-}
+    inlet
+    {
+        type            groovyBC;
 
-laplacianSchemes
-{
-    default         Gauss linear limited 1;
-}
+        variables       "y=pos().y;";
 
-interpolationSchemes
-{
-    default         linear;
-}
+        valueExpression "y < -0.0025 ? 0 : y < 0.0025 ? 1 : 0";
+        gradientExpression "0";
+        fractionExpression "1";
 
-snGradSchemes
-{
-    default         corrected;
-}
-
-fluxRequired
-{
-    default         no;
-    pcorr;
-    p;
+        value           uniform 0;
+    }
+    side
+    {
+        type            zeroGradient;
+    }
+    outlet
+    {
+        type            zeroGradient;
+    }
+    cylinder
+    {
+        type            zeroGradient;
+    }
+    front
+    {   
+        type            zeroGradient;
+    }
+    back 
+    {   
+        type            zeroGradient;
+    }
 }
 
 // ************************************************************************* //
