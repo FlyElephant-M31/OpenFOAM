@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2.3.1                                 |
-|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|  \\    /   O peration     | Version:  v3.0+                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.com                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -15,7 +15,7 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-application     pisoFoam;
+application     pimpleDyMFoam;
 
 startFrom       startTime;
 
@@ -23,61 +23,59 @@ startTime       0;
 
 stopAt          endTime;
 
-endTime         40;
+endTime         6;
 
-deltaT          0.002;
+deltaT          0.0001;
 
-writeControl    timeStep;
+writeControl    adjustableRunTime;
 
-writeInterval   100;
+writeInterval   0.005;
 
 purgeWrite      0;
 
-writeFormat     ascii;
+writeFormat     binary;
 
-writePrecision  6;
+writePrecision  8;
 
 writeCompression off;
 
 timeFormat      general;
 
-timePrecision   6;
+timePrecision   7;
 
 runTimeModifiable true;
 
-libs
-(
-    "libgroovyBC.so" 
-    "libutilityFunctionObjects.so"
-);
+adjustTimeStep  true;
+
+maxCo           6.0;
 
 functions
 {
     S
     {
         type            scalarTransport;
-        outputControl   outputTime;
+
+        functionObjectLibs ("libutilityFunctionObjects.so");
+
         resetOnStartUp  false;
+
         autoSchemes     true;
+
+        outputControl   outputTime;
+
         fvOptions       
         {
             S-01
             {
                 type            scalarExplicitSetValue;
+
                 active          true;
-                selectionMode   points;
-                points
-                4( 
-                    (-0.245  0.105 0)
-                    (-0.245 -0.105 0)
 
-                    (-0.245  0.035 0)
-                    (-0.245 -0.035 0)
-                );
-
-                cellZone        sampleInlet;
                 scalarExplicitSetValueCoeffs
                 {
+                    selectionMode   cellSet;
+                    cellSet         scalarCellSet;
+
                     injectionRate
                     {
                         S   1;

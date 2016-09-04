@@ -18,7 +18,7 @@ FoamFile
 // Which of the steps to run
 castellatedMesh true;
 snap            true;
-addLayers       true;
+addLayers       false;
 
 
 // Geometry. Definition of all surfaces. All surfaces are of class
@@ -29,10 +29,24 @@ addLayers       true;
 // - to 'snap' the mesh boundary to the surface
 geometry
 {
-    cylinder.stl
+    regionSTL.stl
     {
         type triSurfaceMesh;
-        name cylinder;
+        regions
+        {
+            inlet       { name inlet; }
+            outlet      { name outlet; }
+            walls       { name walls; }
+            interface   { name interface; }
+            front       { name front; }
+            back        { name back; }
+        }
+    }
+
+    interface.stl
+    {
+        type triSurfaceMesh;
+        name connected;
     }
 };
 
@@ -66,7 +80,7 @@ castellatedMeshControls
     // Number of buffer layers between different levels.
     // 1 means normal 2:1 refinement restriction, larger means slower
     // refinement.
-    nCellsBetweenLevels 6;
+    nCellsBetweenLevels 3;
 
 
 
@@ -77,6 +91,10 @@ castellatedMeshControls
     // This is a featureEdgeMesh, read from constant/triSurface for now.
     features
     (
+        {
+            file    "regionSTL.eMesh";
+            level 0;
+        }
     );
 
 
@@ -92,10 +110,26 @@ castellatedMeshControls
 
     refinementSurfaces
     {
-        cylinder
+        regionSTL.stl
         {
-            // Surface-wise min and max refinement level
             level (1 1);
+            regions
+            {
+                inlet       { level (1 2); patchInfo { type patch; }}
+                outlet      { level (1 2); patchInfo { type patch; }}
+                walls       { level (1 2); patchInfo { type wall; }}
+                interface   { level (2 2); patchInfo { type wall; }}
+                front       { level (1 2); patchInfo { type empty; }}
+                back        { level (1 2); patchInfo { type empty; }}
+            }
+        }
+
+        connected
+        {
+            level (2 2);
+
+            faceType boundary;
+            faceZone nonUsedZone;
         }
     }
 
@@ -129,7 +163,7 @@ castellatedMeshControls
     // NOTE: This point should never be on a face, always inside a cell, even
     // after refinement.
     // This is an outside point locationInMesh (-0.033 -0.033 0.0033);
-    locationInMesh (0.5 0.01 0.01); // Inside point
+    locationInMesh (0.00 0.000 0.0025); // Inside point
 
     // Whether any faceZones (as specified in the refinementSurfaces)
     // are only on the boundary of corresponding cellZones or also allow
@@ -149,30 +183,30 @@ snapControls
     //- Relative distance for points to be attracted by surface feature point
     //  or edge. True distance is this factor times local
     //  maximum edge length.
-    tolerance 1.2;
+    tolerance 3.1;
 
     //- Number of mesh displacement relaxation iterations.
     nSolveIter 150;
 
     //- Maximum number of snapping relaxation iterations. Should stop
     //  before upon reaching a correct mesh.
-    nRelaxIter 7;
+    nRelaxIter 5;
 
     // Feature snapping
 
         //- Number of feature edge snapping iterations.
         //  Leave out altogether to disable.
-        nFeatureSnapIter 6;
+        nFeatureSnapIter 4;
 
         //- Detect (geometric) features by sampling the surface
-        implicitFeatureSnap true;
+        implicitFeatureSnap false;
 
         //- Use castellatedMeshControls::features
-        explicitFeatureSnap false;
+        explicitFeatureSnap true;
 
         //- Detect features between multiple surfaces
         //  (only for explicitFeatureSnap, default = false)
-        multiRegionFeatureSnap false;
+        multiRegionFeatureSnap true;
 }
 
 
@@ -187,26 +221,25 @@ addLayersControls
     // Per final patch (so not geometry!) the layer information
     layers
     {
-        cylinder
+        wall
         {
-           nSurfaceLayers 5;
-           finalLayerThickness 0.0014;
+            nSurfaceLayers 2;
         }
     }
 
     // Expansion factor for layer mesh
-    expansionRatio 1.4;
+    expansionRatio 1.3;
 
 
     // Wanted thickness of final added cell layer. If multiple layers
     // is the thickness of the layer furthest away from the wall.
     // See relativeSizes parameter.
-    finalLayerThickness 0.0017;
+    finalLayerThickness 0.0001;
 
     // Minimum thickness of cell layer. If for any reason layer
     // cannot be above minThickness do not add layer.
     // See relativeSizes parameter.
-    minThickness 0.0001;
+    minThickness 0.00005;
 
     // If points get not extruded do nGrow layers of connected faces that are
     // also not grown. This helps convergence of the layer addition process

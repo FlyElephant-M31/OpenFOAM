@@ -10,6 +10,7 @@ FoamFile
     version     2.0;
     format      ascii;
     class       volScalarField;
+    location    "0";
     object      p;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -20,41 +21,58 @@ internalField   uniform 0;
 
 boundaryField
 {
-    inlet 
+    back
     {
-        type            zeroGradient;
+        type            empty;
     }
-
+    front
+    {
+        type            empty;
+    }
     outlet 
     {
         type            fixedValue;
         value           uniform 0;
     }
+    inlet 
+    {
+        type            totalPressure;
+        rho             none;
+        psi             none;
+        gamma           1;
+        p0              uniform 15;
+        value           uniform 0;
+    }
 
-    bottom
+    walls
     {
         type            zeroGradient;
     }
 
-    cylinder 
+    ACMI1_blockage
     {
         type            zeroGradient;
+        value           uniform 0;
     }
 
-    top    
+    ACMI2_blockage
     {
-        type            slip;
+        type            zeroGradient;
+        value           uniform 0;
     }
 
-    front
+    ACMI1_couple
     {
-        type            empty;
+        type            cyclicACMI;
+        value           uniform 0;
     }
 
-    back
+    ACMI2_couple
     {
-        type            empty;
+        type            cyclicACMI;
+        value           uniform 0;
     }
 }
+
 
 // ************************************************************************* //

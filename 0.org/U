@@ -10,6 +10,7 @@ FoamFile
     version     2.0;
     format      ascii;
     class       volVectorField;
+    location    "0";
     object      U;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -20,60 +21,55 @@ internalField   uniform (0 0 0);
 
 boundaryField
 {
-    inlet 
+    back
     {
-        type            fixedValue;
-        value           uniform (0.07 0 0);
+        type            empty;
     }
-
-    outlet
+    front
+    {
+        type            empty;
+    }
+    outlet 
     {
         type            inletOutlet;
-        value           $internalField;
         inletValue      uniform (0 0 0);
+        value           uniform (0 0 0);
     }
-
-    cylinder 
+    inlet 
     {
-
-        type groovyBC;
-
-        variables
-        (
-            "f=0.05*(time()-15)*(time()-15);"
-            "zero=vector(0,0,0);"
-            "rot=f*(vector(0,0,1) ^ pos());"
-        );
-
-//        valueExpression "t > start ? vector(0,0,0) : vector(0,0,0)"; 
-        valueExpression "time() > 15 ? rot : zero ";
-        
-  //      fractionExpression "1";
- //       gradientExpression "";
-
-        value       uniform (0 0 0);
+        type            pressureInletVelocity;
+        value           uniform (0 0 0);
     }
-
-    bottom
+    walls
     {
         type            fixedValue;
         value           uniform (0 0 0);
     }
 
-    top
+    ACMI1_blockage
     {
-        type            slip;
+        type            fixedValue;
+        value           uniform (0 0 0);
     }
 
-    front
+    ACMI2_blockage
     {
-        type            empty;
+        type            fixedValue;
+        value           uniform (0 0 0);
     }
 
-    back
+    ACMI1_couple
     {
-        type            empty;
+        type            cyclicACMI;
+        value           uniform (0 0 0);
+    }
+
+    ACMI2_couple
+    {
+        type            cyclicACMI;
+        value           uniform (0 0 0);
     }
 }
+
 
 // ************************************************************************* //

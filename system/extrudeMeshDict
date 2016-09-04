@@ -28,7 +28,7 @@ exposedPatchName back;
 
 // Flip surface normals before usage. Valid only for extrude from surface or
 // patch.
-flipNormals false;
+flipNormals true;
 
 //- Linear extrusion in point-normal direction
 extrudeModel        linearNormal;
@@ -39,7 +39,7 @@ expansionRatio      1.0;
 
 linearNormalCoeffs
 {
-    thickness       0.05;
+    thickness       0.005;
 }
 
 // Do front and back need to be merged? Usually only makes sense for 360

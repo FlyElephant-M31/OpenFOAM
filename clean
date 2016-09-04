@@ -2,7 +2,7 @@
 #
 #----------------------------------------------#
 # Contributor: Tobias Holzmann                 #
-# Last Change: March 2016                      #
+# Last Change: April 2016                      #
 # Topic:                                       #
 # Email:       Tobias.Holzmann@Holzmann-cfd.de #
 #----------------------------------------------#
@@ -15,8 +15,7 @@ clear
 
 #-------------------------------------------------------------------------------
 foamCleanTutorials
-rm -rf constant/triSurface/*.eMesh
-rm -rf 0 log* constant/extend*
+rm -rf 0 log* constant/extend* constant/triS*/*.eMesh
 
 
 #-------------------------------------------------------------------------------

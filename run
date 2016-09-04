@@ -2,8 +2,8 @@
 #
 #----------------------------------------------#
 # Contributor: Tobias Holzmann                 #
-# Last Change: March 2016                      #
-# Topic:       Magnus effect                   #
+# Last Change: June 2016                       #
+# Topic:       Simple ACMI Tutorial            #
 # Email:       Tobias.Holzmann@Holzmann-cfd.de #
 #----------------------------------------------#
 
@@ -18,12 +18,24 @@ source clean
 echo -e "
 -------------------------------------------------------------------------------
 Tutorial by Tobias Holzmann
-Generated March 2016    
-OpenFOAM-2.3.1
+Generated May 2016    
+OpenFOAM-3.0+
 
 
-Topic: Magnus effect
--------------------------------------------------------------------------------"
+Topic: Simple ACMI Tutorial
+-------------------------------------------------------------------------------
+"
+
+
+#------------------------------------------------------------------------------
+if [ -f cad/backgroundMesh.unv ];
+then
+    echo "   - Background mesh exist, proceed..."
+else
+    echo "   - No background mesh exist, create one using the ACMI.py file"
+    echo ""
+    exit
+fi
 
 
 #------------------------------------------------------------------------------
@@ -35,27 +47,54 @@ Start meshing
 
 #------------------------------------------------------------------------------
 echo -e "   - Create background mesh"
-ideasUnvToFoam cad/backgroundMesh.unv > logFile
+ideasUnvToFoam cad/backgroundMesh.unv > logMeshing
 
 
 #------------------------------------------------------------------------------
-echo -e "   - Meshing with snappyHexMesh"
-snappyHexMesh -overwrite >> logFile
+echo -e "   - Extract feature edges"
+surfaceFeatureExtract >> logMeshing
+
+
+#------------------------------------------------------------------------------
+echo -e "   - Meshing with snappyHexMesh (~ 120 seconds)"
+snappyHexMesh -overwrite >> logMeshing
 
 
 #------------------------------------------------------------------------------
 echo -e "   - Extrude one patch to make a 2D mesh"
-extrudeMesh  >> logFile
+extrudeMesh >> logMeshing
+flattenMesh >> logMeshing
+rm -rf 0 constant/polyMesh/*Level
 
 
 #------------------------------------------------------------------------------
-echo -e "   - Change patch type in the boundary file" 
-changeDictionary  >> logFile
+echo -e "   - Merge baffle + interface, and remove not necessary boundaries" 
+cp system/createPatchDict.first system/createPatchDict
+createPatch -overwrite  >> logMeshing
 
 
 #------------------------------------------------------------------------------
-echo -e "   - Translate mesh to point (0 0 0) -> for groovyBC" 
-transformPoints -translate "(0 -0.15 -0.1)"  >> logFile
+echo -e "   - Using interface patches to create faceSets and using the"
+echo -e "     the faceSets to create faceZones (correct orientation and faces)"
+echo -e "     In addition we create the moving cellZone (for motion)"
+topoSet >> logMeshing
+
+
+#------------------------------------------------------------------------------
+echo -e "   - Create ACMI interfaces using the faceZones"
+rm -rf 0
+createBaffles -overwrite >> logMeshing 2>&1
+
+
+#------------------------------------------------------------------------------
+echo -e "   - Remove zero-face entries in boundary file"
+cp system/createPatchDict.second system/createPatchDict
+createPatch -overwrite >> logMeshing
+
+
+#------------------------------------------------------------------------------
+echo -e "   - Renumber the mesh for speedup"
+renumberMesh -overwrite >> logMeshing
 
 
 #------------------------------------------------------------------------------
@@ -67,13 +106,19 @@ End Meshing\n
 
 #------------------------------------------------------------------------------
 echo -e "   - Copy 0.org to 0"
-rm -r 0
 cp -r 0.org 0
 
 
 #------------------------------------------------------------------------------
-echo -e "   - Start simulation (approximately 7 minutes)"
-pisoFoam > logSolver
+echo -e "   - Start simulation (approximately 2-3h)"
+pimpleDyMFoam > logSolve &
+echo -e "   - Process moved to background, if you cancel the run script, kill"
+echo -e "     the process by 'killall pimpleDyMFoam' & 'killall gnuplot'"
+echo -e "   - Plot residuals (PIMPLE loop) and sent to background"
+echo -e "   - Gnuplot script skipped"
+#gnuplot system/plotResiduals &
+echo -e "   - Waiting till calculation done"
+wait
 
 
 #------------------------------------------------------------------------------
